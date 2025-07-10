@@ -1,0 +1,24 @@
+express-app/
+│
+├── app/
+│   ├── controllers/
+│   │   ├── director/
+│   │   │   └── instructorController.js
+│   │   └── instructor/
+│   │       └── studentController.js
+│   │
+│   ├── routes/
+│   │   ├── director/
+│   │   │   └── instructorRoutes.js
+│   │   └── instructor/
+│   │       └── studentRoutes.js
+│
+├── config/
+│   └── supabaseClient.js     ← Supabase client setup here
+│
+├── middleware/
+│   └── auth.js               ← Authentication & role middleware
+│
+├── .env                      ← Environment variables (keys, ports)
+├── server.js                 ← Main entry point to start your app
+├── package.json

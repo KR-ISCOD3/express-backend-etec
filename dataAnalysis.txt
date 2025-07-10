@@ -1,0 +1,123 @@
+users
+    - id
+    - fullname-en
+    - fullname-kh
+    - image
+    - tel
+    - email
+    - password
+    - role
+    - location
+    - startworking-date
+
+instructors
+    - id
+    - user_id
+    - class_id 
+    - position
+    - work_status
+    - status
+
+students
+    - id
+    - user_id
+    - class_id
+    - teacher_id
+
+
+attendance_records
+    - id
+    - stu_id
+    - date
+    - status [note: "present, absent, permission"]
+    - reason
+
+student_scores
+    - id
+    - stu_id
+    - attendance_score DEFAULT 30.0
+    - activity_score DEFAULT 0.0 -- out of 30
+    - final_exam_score DEFAULT 0.0 -- out of 40
+    - total_score
+    - result [60 pass]
+
+classes
+    - id
+    - teacher_id
+    - course
+    - total_student
+    - class_status [physical,online,hybrid]
+    - status [progress,close,pre-end,end]
+    - starting_date
+    - room
+    - floor
+    - campus
+
+------------------------------
+Db draw
+------------------------------
+
+
+Project SchoolManagement {
+  database_type: "PostgreSQL"
+}
+
+Table users {
+  id SERIAL [primary key]
+  fullname_en TEXT
+  fullname_kh TEXT
+  image TEXT
+  tel VARCHAR(20)
+  email TEXT [unique, not null]
+  password TEXT [not null]
+  role VARCHAR(50) [not null, note: "student, instructor, director, assistant"]
+  location TEXT
+  startworking_date DATE
+}
+
+Table instructors {
+  id SERIAL [primary key]
+  user_id INTEGER [ref: > users.id]
+  class_id INTEGER [ref: > classes.id]
+  position TEXT
+  work_status TEXT
+  status TEXT
+}
+
+Table students {
+  id SERIAL [primary key]
+  user_id INTEGER [ref: > users.id]
+  class_id INTEGER [ref: > classes.id]
+  teacher_id INTEGER [ref: > users.id]
+}
+
+Table classes {
+  id SERIAL [primary key]
+  teacher_id INTEGER [ref: > users.id]
+  course TEXT
+  total_student INTEGER
+  class_status VARCHAR(20) [note: "physical, online, hybrid"]
+  status VARCHAR(20) [note: "progress, close, pre-end, end"]
+  starting_date DATE
+  room TEXT
+  floor TEXT
+  campus TEXT
+}
+
+Table attendance_records {
+  id SERIAL [primary key]
+  stu_id INTEGER [ref: > students.id]
+  date DATE
+  status VARCHAR(20) [note: "present, absent, permission"]
+  reason TEXT
+}
+
+Table student_scores {
+  id SERIAL [primary key]
+  stu_id INTEGER [ref: > students.id]
+  attendance_score DECIMAL(5,2) [note: "Default 30.0"]
+  activity_score DECIMAL(5,2) [note: "Out of 30"]
+  final_exam_score DECIMAL(5,2) [note: "Out of 40"]
+  total_score DECIMAL(5,2)
+  result VARCHAR(10) [note: "pass if ≥ 60"]
+}
