@@ -1,18 +1,11 @@
 import jwt from 'jsonwebtoken';
 
 export function authenticateJWT(req, res, next) {
-
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: 'Missing Authorization header' });
-
-  const token = authHeader.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Malformed Authorization header' });
-
-  const secret = process.env.JWT_SECRET_ACCESS;
-  if (!secret) return res.status(500).json({ message: 'Missing JWT secret' });
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ message: 'Missing token' });
 
   try {
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_ACCESS);
     req.user = decoded;
     next();
   } catch (err) {
@@ -20,14 +13,11 @@ export function authenticateJWT(req, res, next) {
   }
 }
 
-// Example role-based access middleware
-export function authorizeRole(role) {
+export function authorizeRole(...allowedRoles) {
   return (req, res, next) => {
-    if (req.user && req.user.role === role) {
+    if (req.user && allowedRoles.includes(req.user.role)) {
       return next();
     }
     return res.status(403).json({ message: 'Forbidden: insufficient role' });
   };
 }
-
-

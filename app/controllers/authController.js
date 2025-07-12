@@ -29,10 +29,26 @@ export const login = async (req, res) => {
 
   // Generate JWT
   const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
+    { id: user.id,name:user.fullname_en, email: user.email, role: user.role },
     process.env.JWT_SECRET_ACCESS,
     { expiresIn: '1h' }
   );
 
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: true,        // ⚠️ Must be true in production (HTTPS)
+    sameSite: 'None',    // ⚠️ Must be 'None' to work cross-site
+    maxAge: 3600000,     // 1 hour
+  });
+
   res.status(200).json({ message: 'Login successful', token });
+};
+
+export const logout = (req, res) => {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict'
+    });
+    res.status(200).json({ message: 'Logged out successfully' });
 };
