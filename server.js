@@ -19,7 +19,7 @@ app.use(express.json());
 
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://eteccenter-system-hz9mklhaa-raksmeys-projects-4a9a66bd.vercel.app', // Replace with actual domain
+    'https://eteccenter-system.vercel.app', // Replace with actual domain
 ];
   
 app.use(cors({
