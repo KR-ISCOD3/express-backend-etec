@@ -23,6 +23,7 @@ app.use(express.json());
 const allowedOrigins = [
     'http://localhost:3000',
     'https://eteccenter-system.vercel.app', // Replace with actual domain
+    'https://etec-system.netlify.app'
 ];
   
 app.use(cors({
