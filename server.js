@@ -26,16 +26,23 @@ const allowedOrigins = [
     'https://etec-system.netlify.app'
 ];
   
+// app.use(cors({
+//     origin: (origin, callback) => {
+//         if (!origin || allowedOrigins.includes(origin)) {
+//         callback(null, true);
+//         } else {
+//         callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+//     credentials: true, // ⚠️ IMPORTANT
+// }));
+
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-        } else {
-        callback(new Error('Not allowed by CORS'));
-        }
+      callback(null, origin || '*'); // Reflect origin back
     },
-    credentials: true, // ⚠️ IMPORTANT
-}));
+    credentials: true,
+  }));
 
 
 // 3. CSRF protection middleware using cookies
