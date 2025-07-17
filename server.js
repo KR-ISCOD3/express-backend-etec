@@ -5,6 +5,9 @@ import cors from 'cors';
 import csrf from 'csurf';
 
 import authRoutes from './app/routes/authRoutes.js';
+import instructorRoutes from './app/routes/instructorRoutes.js'
+import directorRoutes from './app/routes/directorRoutes.js'
+import routeFetchData from './app/routes/routeFetchData.js'
 import { authenticateJWT } from './middleware/auth.js';
 
 dotenv.config();
@@ -39,6 +42,9 @@ const csrfProtection = csrf({ cookie: true });
 
 // 4. Auth routes (login, register, etc)
 app.use('/api/auth', authRoutes);
+app.use('/api/instructor',instructorRoutes);
+app.use('/api/management',directorRoutes);
+app.use('/api/data',routeFetchData)
 
 // 5. CSRF token endpoint - PROTECTED by authenticateJWT!
 // Only logged-in users can get CSRF token tied to their cookie-session
