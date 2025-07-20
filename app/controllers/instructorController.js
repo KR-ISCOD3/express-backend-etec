@@ -17,16 +17,20 @@ export const addClass = async (req, res) => {
     branch_id,
     course_id,
     lesson,
-    total_student,
-    class_status, // optional
-    status,
+    total_student = 0,
+    class_status,
+    status = "progress",
+    term,
+    time,
   } = req.body;
 
-  // Optional: validate required fields
+  console.log("Received addClass request:", req.body);
+
   if (
-    !teacher_id || !room_id || !branch_id ||
-    !course_id ||!lesson|| !total_student || !status
-  ) {
+    !teacher_id || (!room_id && class_status !== "Online") ||
+    !branch_id || !course_id || !lesson || total_student == null || !status ||
+    !term || !time
+  ){
     return res.status(400).json({ error: 'Missing required fields.' });
   }
 
@@ -40,9 +44,11 @@ export const addClass = async (req, res) => {
         course_id,
         lesson,
         total_student,
-        class_status: class_status || null, // allow null
+        class_status: class_status || null,
         status,
-        isdeleted: 'disable'
+        term,
+        time,
+        isdeleted: 'disable',
       }
     ])
     .select();
@@ -121,4 +127,42 @@ export const softDeleteClass = async (req, res) => {
   }
 
   res.json({ message: 'Class deleted (soft) successfully', data });
+};
+
+
+export const getClassByUserId = async (req, res) => {
+  const userId = req.params.userId;
+
+  // Using Supabase RPC style join via select with foreign table columns
+  // The syntax: '*, room:rooms(*), branch:branches(*), course:courses(*)'
+  const { data, error } = await supabase
+  .from('classes')
+  .select(`
+    *,
+    rooms:room_id (
+      id,
+      room_number
+    ),
+    branches:branch_id (
+      id,
+      branch_name
+    ),
+    courses:course_id (
+      id,
+      name
+    )
+  `)
+  .eq('teacher_id', userId)
+  .eq('isdeleted', 'disable'); // only non-deleted classes
+
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  if (!data || data.length === 0) {
+    return res.status(404).json({ error: 'No classes found for this user.' });
+  }
+
+  res.json({ data });
 };

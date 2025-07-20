@@ -1,5 +1,5 @@
 import express from 'express';
-import { addClass, getInstructorDashboard, softDeleteClass, updateClass } from '../controllers/instructorController.js';
+import { addClass, getClassByUserId, getInstructorDashboard, softDeleteClass, updateClass } from '../controllers/instructorController.js';
 import { authenticateJWT, authorizeRole } from '../../middleware/auth.js';
 
 const router = express.Router();
@@ -10,13 +10,16 @@ router.use(authorizeRole('instructor'));
 
 router.get('/', getInstructorDashboard);
 
+// get a class by user if
+router.get('/class/:userId', getClassByUserId);
+
 // Add a class
-router.post('/', addClass);
+router.post('/class', addClass);
 
 // Update a class by ID
-router.put('/:id', updateClass);
+router.put('/class/:id', updateClass);
 
 // Soft delete a class by ID
-router.delete('/:id', softDeleteClass);
+router.delete('/class/:id', softDeleteClass);
 
 export default router;
