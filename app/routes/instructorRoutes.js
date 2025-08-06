@@ -1,5 +1,5 @@
 import express from 'express';
-import { addClass, getClassByUserId, getInstructorDashboard, softDeleteClass, updateClass } from '../controllers/instructorController.js';
+import { addClass, getClassByUserId, getInstructorDashboard, preEndClass, softDeleteClass, updateClass } from '../controllers/instructorController.js';
 import { authenticateJWT, authorizeRole } from '../../middleware/auth.js';
 
 const router = express.Router();
@@ -21,5 +21,8 @@ router.put('/class/:id', updateClass);
 
 // Soft delete a class by ID
 router.delete('/class/:id', softDeleteClass);
+
+// pre End a class by ID
+router.put('/class/preEnd/:id', preEndClass);
 
 export default router;

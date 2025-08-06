@@ -69,21 +69,30 @@ export const updateClass = async (req, res) => {
     branch_id,
     course_id,
     lesson,
-    total_student,
-    class_status, // optional
-    status,
+    total_student = 0,
+    class_status,
+    status = "progress",
+    term,
+    time,
   } = req.body;
 
-  // Validate required fields (adjust if any are optional)
+  // Validate required fields similar to addClass:
   if (
-    !teacher_id || !room_id || !branch_id ||
-    !course_id ||!lesson|| !total_student || !status
+    !teacher_id ||
+    (!room_id && class_status !== "Online") ||
+    !branch_id ||
+    !course_id ||
+    !lesson ||
+    total_student == null ||
+    !status ||
+    !term ||
+    !time
   ) {
-    return res.status(400).json({ error: 'Missing required fields.' });
+    return res.status(400).json({ error: "Missing required fields." });
   }
 
   const { data, error } = await supabase
-    .from('classes')
+    .from("classes")
     .update({
       teacher_id,
       room_id,
@@ -93,7 +102,29 @@ export const updateClass = async (req, res) => {
       total_student,
       class_status: class_status || null,
       status,
+      term,
+      time,
     })
+    .eq("id", classId)
+    .select()
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  if (data.length === 0) {
+    return res.status(404).json({ error: "Class not found" });
+  }
+
+  res.json({ message: "Class updated successfully", data });
+};
+
+export const preEndClass = async (req, res) => {
+  const classId = req.params.id;
+
+  const { data, error } = await supabase
+    .from('classes')
+    .update({ status: 'pre-end' })
     .eq('id', classId)
     .select();
 
@@ -105,7 +136,7 @@ export const updateClass = async (req, res) => {
     return res.status(404).json({ error: 'Class not found' });
   }
 
-  res.json({ message: 'Class updated successfully', data });
+  res.json({ message: 'Class pre-end successfully', data });
 };
 
 
@@ -153,7 +184,8 @@ export const getClassByUserId = async (req, res) => {
     )
   `)
   .eq('teacher_id', userId)
-  .eq('isdeleted', 'disable'); // only non-deleted classes
+  .eq('isdeleted', 'disable')
+  .order('id', { ascending: false });
 
 
   if (error) {
