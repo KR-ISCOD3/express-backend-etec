@@ -198,3 +198,33 @@ export const getClassByUserId = async (req, res) => {
 
   res.json({ data });
 };
+
+export const createStudent = async (req, res) => {
+  const { name, gender, phone, teacher_id, class_id } = req.body;
+
+  // Basic validation
+  if (!name || !gender || !teacher_id || !class_id) {
+    return res.status(400).json({ error: 'Missing required fields: name, gender, teacher_id, class_id' });
+  }
+
+  // Validate gender value
+  const validGenders = ['Male', 'Female', 'Other'];
+  if (!validGenders.includes(gender)) {
+    return res.status(400).json({ error: 'Invalid gender. Allowed values: Male, Female, Other' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('students')
+      .insert([{ name, gender, phone, teacher_id, class_id }])
+      .select();  // returns the inserted row(s)
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.status(201).json({ message: 'Student created successfully', student: data[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Unexpected server error' });
+  }
+};
